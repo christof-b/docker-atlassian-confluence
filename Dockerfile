@@ -13,19 +13,9 @@ ENV CERTIFICATE   $CONF_HOME/certificate
 RUN set -x \
     && apk --no-cache add curl xmlstarlet bash ttf-dejavu libc6-compat \
     && mkdir -p                "${CONF_HOME}" \
-    && chmod -R 700            "${CONF_HOME}" \
-    && chown daemon:daemon     "${CONF_HOME}" \
     && mkdir -p                "${CONF_INSTALL}/conf" \
     && curl -Ls                "https://www.atlassian.com/software/confluence/downloads/binary/atlassian-confluence-${CONF_VERSION}.tar.gz" | tar -xz --directory "${CONF_INSTALL}" --strip-components=1 --no-same-owner \
     && curl -Ls                "https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.44.tar.gz" | tar -xz --directory "${CONF_INSTALL}/confluence/WEB-INF/lib" --strip-components=1 --no-same-owner "mysql-connector-java-5.1.44/mysql-connector-java-5.1.44-bin.jar" \
-    && chmod -R 700            "${CONF_INSTALL}/conf" \
-    && chmod -R 700            "${CONF_INSTALL}/temp" \
-    && chmod -R 700            "${CONF_INSTALL}/logs" \
-    && chmod -R 700            "${CONF_INSTALL}/work" \
-    && chown -R daemon:daemon  "${CONF_INSTALL}/conf" \
-    && chown -R daemon:daemon  "${CONF_INSTALL}/temp" \
-    && chown -R daemon:daemon  "${CONF_INSTALL}/logs" \
-    && chown -R daemon:daemon  "${CONF_INSTALL}/work" \
     && echo -e                 "\nconfluence.home=$CONF_HOME" >> "${CONF_INSTALL}/confluence/WEB-INF/classes/confluence-init.properties" \
     && xmlstarlet              ed --inplace \
         --delete               "Server/@debug" \
@@ -37,13 +27,25 @@ RUN set -x \
         --delete               "Server/Service/Engine/Host/@debug" \
         --delete               "Server/Service/Engine/Host/Context/@debug" \
                                "${CONF_INSTALL}/conf/server.xml" \
-    && touch -d "@0"           "${CONF_INSTALL}/conf/server.xml" \
-    && chown daemon:daemon     "${JAVA_CACERTS}"
+    && touch -d "@0"           "${CONF_INSTALL}/conf/server.xml"
 
 # Use the default unprivileged account. This could be considered bad practice
 # on systems where multiple processes end up being executed by 'daemon' but
 # here we only ever run one process anyway.
-USER daemon:daemon
+RUN adduser -D -G root -g "ROS User" rosuser \
+    && chmod -R 770           "${CONF_HOME}" \
+    && chown -R rosuser:root  "${CONF_HOME}" \
+    && chmod -R 770            "${CONF_INSTALL}/conf" \
+    && chmod -R 770            "${CONF_INSTALL}/logs" \
+    && chmod -R 770            "${CONF_INSTALL}/temp" \
+    && chmod -R 770            "${CONF_INSTALL}/work" \
+    && chown -R rosuser:root  "${CONF_INSTALL}/conf" \
+    && chown -R rosuser:root  "${CONF_INSTALL}/logs" \
+    && chown -R rosuser:root  "${CONF_INSTALL}/temp" \
+    && chown -R rosuser:root  "${CONF_INSTALL}/work" \
+    && chown rosuser:root     "${JAVA_CACERTS}"
+
+USER rosuser
 
 # Expose default HTTP connector port.
 EXPOSE 8090 8091
