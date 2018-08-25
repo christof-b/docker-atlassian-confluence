@@ -15,7 +15,7 @@ ENV TZ			  CET-2CEDT-2
 RUN set -x \
 	&& echo ${TZ} > /etc/TZ \
 	&& apk update \
-    && apk --no-cache add curl xmlstarlet bash ttf-dejavu libc6-compat \
+    && apk --no-cache add curl xmlstarlet bash ttf-dejavu libc6-compat apr-util apr-dev openssl openssl-dev gcc musl-dev make \
     && mkdir -p                "${CONF_HOME}" \
     && mkdir -p                "${CONF_INSTALL}/conf" \
     && curl -Ls                "https://www.atlassian.com/software/confluence/downloads/binary/atlassian-confluence-${CONF_VERSION}.tar.gz" | tar -xz --directory "${CONF_INSTALL}" --strip-components=1 --no-same-owner \
@@ -31,7 +31,11 @@ RUN set -x \
         --delete               "Server/Service/Engine/Host/@debug" \
         --delete               "Server/Service/Engine/Host/Context/@debug" \
                                "${CONF_INSTALL}/conf/server.xml" \
-    && touch -d "@0"           "${CONF_INSTALL}/conf/server.xml"
+    && touch -d "@0"           "${CONF_INSTALL}/conf/server.xml" \
+    && tar -xzvf ${CONF_INSTALL}/bin/tomcat-native.tar.gz -C /tmp \
+    && cd /tmp/tomcat-native-1.2.16-src/native && ./configure --with-apr=/usr/bin/apr-1-config --with-java-home=/usr/lib/jvm/java-1.8-openjdk --with-ssl=yes --prefix=/usr && make && make install \
+    && rm -r -f /tmp/tomcat-native-1.2.16-src \
+    && apk del apr-dev openssl-dev gcc musl-dev make
 
 # Use the default unprivileged account. This could be considered bad practice
 # on systems where multiple processes end up being executed by 'daemon' but
