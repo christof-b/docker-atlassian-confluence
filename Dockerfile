@@ -61,8 +61,8 @@ EXPOSE 8090 8091
 
 # Set volume mount points for installation and home directory. Changes to the
 # home directory needs to be persisted as well as parts of the installation
-# directory due to eg. logs.
-VOLUME ["/var/atlassian/confluence", "/var/atlassian/confluence/caches/indexes", "/opt/atlassian/confluence/logs"]
+# directory due to eg. logs. Index folder should be mounted manually, because of issues with NFS.
+VOLUME ["/var/atlassian/confluence", "/opt/atlassian/confluence/logs"]
 
 # Set the default working directory as the Confluence home directory.
 WORKDIR /var/atlassian/confluence
