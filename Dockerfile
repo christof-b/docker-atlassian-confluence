@@ -14,6 +14,7 @@ ENV TZ			  CET-2CEDT-2
 # directory structure.
 RUN set -x \
 	&& echo ${TZ} > /etc/TZ \
+	&& apk update \
     && apk --no-cache add curl xmlstarlet bash ttf-dejavu libc6-compat \
     && mkdir -p                "${CONF_HOME}" \
     && mkdir -p                "${CONF_INSTALL}/conf" \
@@ -35,7 +36,8 @@ RUN set -x \
 # Use the default unprivileged account. This could be considered bad practice
 # on systems where multiple processes end up being executed by 'daemon' but
 # here we only ever run one process anyway.
-RUN adduser -D -G root -g "ROS User" rosuser \
+RUN set -x \
+	&& adduser -D -G root -g "ROS User" rosuser \
     && chmod -R 770           "${CONF_HOME}" \
     && chown -R rosuser:root  "${CONF_HOME}" \
     && chmod -R 770            "${CONF_INSTALL}/conf" \
