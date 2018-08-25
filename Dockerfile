@@ -8,9 +8,12 @@ ENV CONF_VERSION  6.10.1
 ENV JAVA_CACERTS  $JAVA_HOME/jre/lib/security/cacerts
 ENV CERTIFICATE   $CONF_HOME/certificate
 
+ENV TZ			  CET-2CEDT-2
+
 # Install Atlassian Confluence and helper tools and setup initial home
 # directory structure.
 RUN set -x \
+	&& echo ${TZ} > /etc/TZ \
     && apk --no-cache add curl xmlstarlet bash ttf-dejavu libc6-compat \
     && mkdir -p                "${CONF_HOME}" \
     && mkdir -p                "${CONF_INSTALL}/conf" \
