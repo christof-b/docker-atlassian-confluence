@@ -15,7 +15,7 @@ ENV TZ			  CET-2CEDT-2
 RUN set -x \
     && echo ${TZ} > /etc/TZ \
     && apk update \
-    && apk --no-cache add curl xmlstarlet bash ttf-dejavu libc6-compat apr-util apr-dev openssl openssl-dev gcc musl-dev make \
+    && apk --no-cache add curl xmlstarlet bash ttf-dejavu libc6-compat apr-util apr-dev openssl openssl-dev gcc musl-dev make clamav-daemon \
     && mkdir -p                "${CONF_HOME}" \
     && mkdir -p                "${CONF_INSTALL}/conf" \
     && curl -Ls                "https://www.atlassian.com/software/confluence/downloads/binary/atlassian-confluence-${CONF_VERSION}.tar.gz" | tar -xz --directory "${CONF_INSTALL}" --strip-components=1 --no-same-owner \
