@@ -67,6 +67,9 @@ VOLUME ["/var/atlassian/confluence", "/opt/atlassian/confluence/logs"]
 # Set the default working directory as the Confluence home directory.
 WORKDIR /var/atlassian/confluence
 
+# Add freshclam config
+COPY "freshclam.conf" "/etc/clamav/"
+
 COPY docker-entrypoint.sh /
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
